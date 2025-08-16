@@ -1,0 +1,33 @@
+name: Build llama-cpp-python wheel (Windows x64, Python 3.13)
+
+on:
+  workflow_dispatch:   # manual trigger
+
+jobs:
+  build:
+    runs-on: windows-latest   # Windows Server 2022 x64 runner
+
+    steps:
+      - name: Checkout source + submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python 3.13 (pre-release)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13-dev'   # latest 3.13 build available on GHA
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip build wheel
+
+      - name: Build wheel
+        run: |
+          python -m build --wheel --outdir dist
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-cpp-python-win-py313-whl
+          path: dist/*.whl
